@@ -19,5 +19,8 @@ namespace Gestion_de_salas.Models
 
         public TipoUsuario TipoUsuario { get; set; }
 
+
+        // RELACIÓN CON TABLA INTERMEDIA USUARIOCARRERA
+        public List<UsuarioCarrera> UsuarioCarreras { get; set; } = new List<UsuarioCarrera>();
     }
 }
