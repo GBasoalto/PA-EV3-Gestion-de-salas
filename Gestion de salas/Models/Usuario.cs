@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Gestion_de_salas.Models
+{
+    public class Usuario
+    {
+        public int Id { get; set; }
+        public string Nombre { get; set; }
+        public string Apellido1 { get; set; }
+        public string Apellido2 { get; set; }
+        public string Rut { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public bool Estado { get; set; }
+        public string Tipo { get; set; }
+
+        //ESTABLECER LA RELACION CON TIPOUSUARIO
+        [ForeignKey("TipoUsuario")]
+        public int TipoUsuarioId { get; set; }
+
+        public TipoUsuario TipoUsuario { get; set; }
+    }
+}
