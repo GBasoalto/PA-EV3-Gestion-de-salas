@@ -12,12 +12,12 @@ namespace Gestion_de_salas.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public bool Estado { get; set; }
-        public string Tipo { get; set; }
 
         //ESTABLECER LA RELACION CON TIPOUSUARIO
         [ForeignKey("TipoUsuario")]
-        public int TipoUsuarioId { get; set; }
+        public int Tipo { get; set; }
 
         public TipoUsuario TipoUsuario { get; set; }
+
     }
 }

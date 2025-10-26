@@ -6,14 +6,13 @@ namespace Gestion_de_salas.Models
     public class UsuarioCarrera
     {
         public int Id { get; set; }
+        
+        [ForeignKey("Usuario")]
         public int UsuarioId { get; set; }
-        public int CarreraId { get; set; }
-
-        [ForeignKey("UsuarioId")]
         public Usuario Usuario { get; set; }
 
-
-        [ForeignKey("CarreraId")]
+        [ForeignKey("Carrera")]
+        public int CarreraId { get; set; }
         public Carrera Carrera { get; set; }
     }
 }
