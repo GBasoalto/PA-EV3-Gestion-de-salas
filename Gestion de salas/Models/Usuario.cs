@@ -15,7 +15,7 @@ namespace Gestion_de_salas.Models
 
         //ESTABLECER LA RELACION CON TIPOUSUARIO
         [ForeignKey("TipoUsuario")]
-        public int Tipo { get; set; }
+        public int TipoUsuarioId { get; set; }
 
         public TipoUsuario TipoUsuario { get; set; }
 
