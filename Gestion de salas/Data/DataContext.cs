@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
+
 using Gestion_de_salas.Models;
 
 namespace Gestion_de_salas.Data
@@ -42,7 +43,7 @@ namespace Gestion_de_salas.Data
                 );
 
             modelBuilder.Entity<Carrera>().HasData(
-               new Carrera { Id = 1, Nombre = "Técnico en Veterinaria" },
+                new Carrera { Id = 1, Nombre = "Técnico en Veterinaria" },
                 new Carrera { Id = 2, Nombre = "Técnico en Farmacia" },
                 new Carrera { Id = 3, Nombre = "Técnico en Mantenimiento Industrial" },
                 new Carrera { Id = 4, Nombre = "Técnico en Desarrollo de Video Juegos" },
@@ -70,9 +71,6 @@ namespace Gestion_de_salas.Data
                 new Carrera { Id = 26, Nombre = "Técnico en Mecánica" },
                 new Carrera { Id = 27, Nombre = "Técnico en Mecánica Automotriz y Autotrónica" }
                 );
-
-
-
         }
     }
 }
