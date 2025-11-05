@@ -17,6 +17,35 @@ html {
   min-height: 100%;
 }
 
+
+
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
+
+/* Sidebar */
+.sidebar {
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* Imagen del header */
+.logo-header {
+    height: 40px;
+    width: auto;
+}
+
+/* Para asegurar que el contenido se alinee correctamente */
+.d-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.content {
+    flex-grow: 1;
+    background-color: #f8f9fa;
+}
+
