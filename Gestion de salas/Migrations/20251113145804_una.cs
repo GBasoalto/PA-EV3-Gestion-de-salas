@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Gestion_de_salas.Migrations
 {
     /// <inheritdoc />
-    public partial class uno : Migration
+    public partial class una : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -211,6 +211,16 @@ namespace Gestion_de_salas.Migrations
                     { 1, 1 },
                     { 2, 2 },
                     { 3, 3 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Usuarios",
+                columns: new[] { "Id", "Apellido1", "Apellido2", "Email", "Estado", "Nombre", "Password", "Rut", "TipoUsuarioId" },
+                values: new object[,]
+                {
+                    { 1, "Bsaoalto", "Gallegos", "gbasoalto24@cftsa.cl", true, "Gonzalo", "12345678", "15907638-5", 1 },
+                    { 2, "Castillo", "Vera", "jcastillo24@cftsa.cl", true, "Jairo", "12345678", "11111111-1", 2 },
+                    { 3, "Castro", "Castro", "Jcastro24@cftsa.cl", true, "Joel", "12345678", "22222222-2", 3 }
                 });
 
             migrationBuilder.CreateIndex(

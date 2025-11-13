@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 using Gestion_de_salas.Models;
+
 
 namespace Gestion_de_salas.Data
 {
@@ -29,7 +29,47 @@ namespace Gestion_de_salas.Data
             //    new Rol { Id = 2, Nombre = "Empleado" }
             //);
 
-            modelBuilder.Entity<TipoUsuario>().HasData(
+            modelBuilder.Entity<Usuario>().HasData(
+                new Usuario
+                {
+                    Id = 1,
+                    Nombre = "Gonzalo",
+                    Apellido1 = "Bsaoalto",
+                    Apellido2 = "Gallegos",
+                    Rut = "15907638-5",
+                    Email = "gbasoalto24@cftsa.cl",
+                    Password = "12345678",
+                    Estado = true,
+                    TipoUsuarioId = 1 // Administrador
+                },
+                new Usuario
+                {
+                    Id = 2,
+                    Nombre = "Jairo",
+                    Apellido1 = "Castillo",
+                    Apellido2 = "Vera",
+                    Rut = "11111111-1",
+                    Email = "jcastillo24@cftsa.cl",
+                    Password = "12345678",
+                    Estado = true,
+                    TipoUsuarioId = 2 // Docente
+                },
+                new Usuario
+                {
+                    Id = 3,
+                    Nombre = "Joel",
+                    Apellido1 = "Castro",
+                    Apellido2 = "Castro",
+                    Rut = "22222222-2",
+                    Email = "Jcastro24@cftsa.cl",
+                    Estado = true,
+                    Password =  "12345678",
+                    TipoUsuarioId = 3 // Estudiante
+                }
+                );
+
+
+                    modelBuilder.Entity<TipoUsuario>().HasData(
                 new TipoUsuario { Id = 1, Tipo = TipoUsuario.Nombre.Administrador },
                 new TipoUsuario { Id = 2, Tipo = TipoUsuario.Nombre.Docente },
                 new TipoUsuario { Id = 3, Tipo = TipoUsuario.Nombre.Estudiante }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Gestion_de_salas.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20251102015555_uno")]
-    partial class uno
+    [Migration("20251113145804_una")]
+    partial class una
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -372,6 +372,44 @@ namespace Gestion_de_salas.Migrations
                     b.HasIndex("TipoUsuarioId");
 
                     b.ToTable("Usuarios");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Apellido1 = "Bsaoalto",
+                            Apellido2 = "Gallegos",
+                            Email = "gbasoalto24@cftsa.cl",
+                            Estado = true,
+                            Nombre = "Gonzalo",
+                            Password = "12345678",
+                            Rut = "15907638-5",
+                            TipoUsuarioId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Apellido1 = "Castillo",
+                            Apellido2 = "Vera",
+                            Email = "jcastillo24@cftsa.cl",
+                            Estado = true,
+                            Nombre = "Jairo",
+                            Password = "12345678",
+                            Rut = "11111111-1",
+                            TipoUsuarioId = 2
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Apellido1 = "Castro",
+                            Apellido2 = "Castro",
+                            Email = "Jcastro24@cftsa.cl",
+                            Estado = true,
+                            Nombre = "Joel",
+                            Password = "12345678",
+                            Rut = "22222222-2",
+                            TipoUsuarioId = 3
+                        });
                 });
 
             modelBuilder.Entity("Gestion_de_salas.Models.UsuarioCarrera", b =>
