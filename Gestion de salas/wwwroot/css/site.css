@@ -27,7 +27,7 @@ body {
 .btn-link.nav-link:focus,
 .form-control:focus,
 .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #5b6dcd;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #5468e8;
 }
 
 /* ===== HEADER ===== */
@@ -35,45 +35,31 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: linear-gradient(135deg, #5b6dcd 0%, #4a5ab8 100%);
+    background: #5468e8;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-    header .navbar {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        margin-bottom: 0 !important;
-        padding: 0.75rem 1.5rem;
-    }
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+}
 
-    /* Ocultar el título del navbar */
-    header .navbar-brand {
-        display: none;
-    }
-
-    /* Ocultar links del navbar que están duplicados en sidebar */
-    header .navbar-nav .nav-item {
-        display: none;
-    }
-
-/* ===== LOGO ===== */
-.logo-header {
-    width: 100%;
-    max-width: 220px;
-    height: auto;
+/* Logo en el header superior */
+.logo-header-top {
+    height: 45px;
+    width: auto;
     display: block;
-    margin: 0 0 1.5rem 0;
-    padding: 1rem;
-    background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease;
 }
 
-    .logo-header:hover {
-        transform: scale(1.02);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    .logo-header-top:hover {
+        transform: scale(1.05);
     }
 
 /* ===== LAYOUT PRINCIPAL ===== */
@@ -81,7 +67,7 @@ header {
     display: flex;
     flex-direction: row;
     flex: 1;
-    min-height: calc(100vh - 65px);
+    min-height: calc(100vh - 60px);
 }
 
 /* ===== SIDEBAR ===== */
@@ -91,7 +77,7 @@ header {
     min-height: 100%;
     position: sticky;
     top: 0;
-    background: linear-gradient(180deg, #4a5ab8 0%, #3d4b9e 100%);
+    background: #5468e8;
     padding: 1.5rem 1rem;
     overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
@@ -184,7 +170,7 @@ main {
 
 /* Sección de antecedentes */
 .section-header {
-    background: linear-gradient(135deg, #5b6dcd 0%, #4a5ab8 100%);
+    background: #5468e8;
     color: white;
     padding: 0.75rem 1.5rem;
     border-radius: 6px;
@@ -204,124 +190,5 @@ main {
     .info-table td:first-child {
         background-color: #e8eaf6;
         font-weight: 600;
-        color: #4a5ab8;
+        color: #5468e8;
         padding: 0.75rem 1rem;
-        width: 200px;
-    }
-
-    .info-table td:last-child {
-        background-color: #e0f7f6;
-        padding: 0.75rem 1rem;
-        color: #2c3e50;
-    }
-
-/* Botones de reglamento */
-.btn-reglamento {
-    background: linear-gradient(135deg, #5b6dcd 0%, #4a5ab8 100%);
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 6px;
-    font-weight: 600;
-    margin-right: 1rem;
-    margin-bottom: 1rem;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(91, 109, 205, 0.3);
-}
-
-    .btn-reglamento:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(91, 109, 205, 0.4);
-        background: linear-gradient(135deg, #6a7dd9 0%, #5969c4 100%);
-    }
-
-/* ===== FOOTER ===== */
-footer {
-    background: linear-gradient(135deg, #4a5ab8 0%, #3d4b9e 100%);
-    color: rgba(255, 255, 255, 0.9);
-    padding: 1.25rem 2rem;
-    text-align: center;
-    border-top: 3px solid #5dd3c8;
-    margin-top: auto;
-    font-size: 0.9rem;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 200px;
-        min-width: 200px;
-        padding: 1rem 0.5rem;
-    }
-
-    .logo-header {
-        max-width: 160px;
-        padding: 0.75rem;
-    }
-
-    .sidebar h4 {
-        font-size: 0.95rem;
-    }
-
-    .sidebar .nav-link {
-        padding: 0.65rem 0.75rem;
-        font-size: 0.85rem;
-    }
-
-    main {
-        padding: 1rem;
-    }
-}
-
-@media (max-width: 576px) {
-    .d-flex {
-        flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        min-width: 100%;
-        position: relative;
-        min-height: auto;
-    }
-
-    .logo-header {
-        max-width: 180px;
-        margin-bottom: 1rem;
-    }
-
-    .sidebar .nav {
-        flex-direction: row;
-        overflow-x: auto;
-        gap: 0.5rem;
-    }
-
-    .sidebar .nav-link {
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .sidebar h4 {
-        display: none;
-    }
-}
-
-/* ===== SCROLLBAR PERSONALIZADO ===== */
-.sidebar::-webkit-scrollbar {
-    width: 6px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-}
-
-    .sidebar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
-    }
