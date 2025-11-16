@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion_de_salas.Models
 {
@@ -10,20 +11,19 @@ namespace Gestion_de_salas.Models
         public TimeOnly HoraFin { get; set; }
         [ForeignKey("Usuario")]
         public int UsuarioId { get; set; }
+
+        [ValidateNever]
         public Usuario Usuario { get; set; }
 
         [ForeignKey("Sala")]
         public int SalaId { get; set; }
+
+        [ValidateNever]
         public Sala Sala { get; set; }
 
 
-        public Estado EstadoReserva { get; set; }
-        public enum Estado
-        {
-            Activa = 1,
-            Cancelada = 2,
-            Completada = 3
-        }
+        public string EstadoReserva { get; set; } = "Activa"; // Valores: "Activa", "Cancelada", "Completada"
+        
         public List<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
     }
 }

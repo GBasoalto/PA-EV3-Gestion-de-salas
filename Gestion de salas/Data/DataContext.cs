@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
 using Gestion_de_salas.Models;
-
 
 namespace Gestion_de_salas.Data
 {
@@ -10,37 +8,32 @@ namespace Gestion_de_salas.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
-            //identificar los modelos que se veran en la base de datos
-            //public DbSet<Herramienta> Herramientas { get; set; } EJEMPLO!!
-            public DbSet<Usuario> Usuarios { get; set; }
-            public DbSet<TipoUsuario> TipoUsuarios { get; set; }
-            public DbSet<Carrera> Carreras { get; set; }
-            public DbSet<UsuarioCarrera> UsuarioCarreras { get; set; } 
-            public DbSet<Sala> Salas { get; set; }
-            public DbSet<Reserva> Reservas { get; set; }
-            public DbSet<Movimiento> Movimientos { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) //CREAR SEMILLAS ACA
+        public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<TipoUsuario> TipoUsuarios { get; set; }
+        public DbSet<Carrera> Carreras { get; set; }
+        public DbSet<UsuarioCarrera> UsuarioCarreras { get; set; }
+        public DbSet<Sala> Salas { get; set; }
+        public DbSet<Reserva> Reservas { get; set; }
+        public DbSet<Movimiento> Movimientos { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            //EJEMPLOS DE SEMILLAS
-            //modelBuilder.Entity<Rol>().HasData(
-            //    new Rol { Id = 1, Nombre = "Administrador" },
-            //    new Rol { Id = 2, Nombre = "Empleado" }
-            //);
 
+            // SEMILLAS PARA USUARIOS
             modelBuilder.Entity<Usuario>().HasData(
                 new Usuario
                 {
                     Id = 1,
                     Nombre = "Gonzalo",
-                    Apellido1 = "Bsaoalto",
+                    Apellido1 = "Basoalto",
                     Apellido2 = "Gallegos",
                     Rut = "15907638-5",
                     Email = "gbasoalto24@cftsa.cl",
                     Password = "12345678",
                     Estado = true,
-                    TipoUsuarioId = 1 // Administrador
+                    TipoUsuarioId = 1
                 },
                 new Usuario
                 {
@@ -52,7 +45,7 @@ namespace Gestion_de_salas.Data
                     Email = "jcastillo24@cftsa.cl",
                     Password = "12345678",
                     Estado = true,
-                    TipoUsuarioId = 2 // Docente
+                    TipoUsuarioId = 2
                 },
                 new Usuario
                 {
@@ -63,25 +56,27 @@ namespace Gestion_de_salas.Data
                     Rut = "22222222-2",
                     Email = "Jcastro24@cftsa.cl",
                     Estado = true,
-                    Password =  "12345678",
-                    TipoUsuarioId = 3 // Estudiante
+                    Password = "12345678",
+                    TipoUsuarioId = 3
                 }
-                );
+            );
 
+            // SEMILLAS PARA TIPOUSUARIO - CORREGIDO (usando string)
+            modelBuilder.Entity<TipoUsuario>().HasData(
+                new TipoUsuario { Id = 1, Tipo = "Administrador" },
+                new TipoUsuario { Id = 2, Tipo = "Docente" },
+                new TipoUsuario { Id = 3, Tipo = "Estudiante" }
+            );
 
-                    modelBuilder.Entity<TipoUsuario>().HasData(
-                new TipoUsuario { Id = 1, Tipo = TipoUsuario.Nombre.Administrador },
-                new TipoUsuario { Id = 2, Tipo = TipoUsuario.Nombre.Docente },
-                new TipoUsuario { Id = 3, Tipo = TipoUsuario.Nombre.Estudiante }
-                );
-
+            // SEMILLAS PARA SALAS - CORREGIDO (usando string en lugar del enum)
             modelBuilder.Entity<Sala>().HasData(
-                new Sala { Id = 1, Nombre = "Sala A", Capacidad = 4, EstadoSala = Sala.Estado.Disponible },
-                new Sala { Id = 2, Nombre = "Sala B", Capacidad = 4, EstadoSala = Sala.Estado.Disponible },
-                new Sala { Id = 3, Nombre = "Sala C", Capacidad = 4, EstadoSala = Sala.Estado.Disponible },
-                new Sala { Id = 4, Nombre = "Sala D", Capacidad = 4, EstadoSala = Sala.Estado.Disponible }
-                );
+                new Sala { Id = 1, Nombre = "Sala A", Capacidad = 4, EstadoSala = "Disponible" },
+                new Sala { Id = 2, Nombre = "Sala B", Capacidad = 4, EstadoSala = "Disponible" },
+                new Sala { Id = 3, Nombre = "Sala C", Capacidad = 4, EstadoSala = "Disponible" },
+                new Sala { Id = 4, Nombre = "Sala D", Capacidad = 4, EstadoSala = "Disponible" }
+            );
 
+            // SEMILLAS PARA CARRERAS
             modelBuilder.Entity<Carrera>().HasData(
                 new Carrera { Id = 1, Nombre = "Técnico en Veterinaria" },
                 new Carrera { Id = 2, Nombre = "Técnico en Farmacia" },
@@ -110,7 +105,7 @@ namespace Gestion_de_salas.Data
                 new Carrera { Id = 25, Nombre = "Técnico en Obras Civiles" },
                 new Carrera { Id = 26, Nombre = "Técnico en Mecánica" },
                 new Carrera { Id = 27, Nombre = "Técnico en Mecánica Automotriz y Autotrónica" }
-                );
+            );
         }
     }
 }

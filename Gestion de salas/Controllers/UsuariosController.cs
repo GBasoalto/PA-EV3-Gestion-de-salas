@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Gestion_de_salas.Data;
@@ -48,24 +44,31 @@ namespace Gestion_de_salas.Controllers
         // GET: Usuarios/Create
         public IActionResult Create()
         {
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Id");
+            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo");
             return View();
         }
 
         // POST: Usuarios/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido1,Apellido2,Rut,Email,Password,Estado,TipoUsuarioId")] Usuario usuario)
+        public async Task<IActionResult> Create(Usuario usuario) // Sin [Bind]
         {
             if (ModelState.IsValid)
             {
-                _context.Add(usuario);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    _context.Add(usuario);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al guardar: {ex.Message}");
+                    ModelState.AddModelError("", "Error al guardar el usuario: " + ex.Message);
+                }
             }
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Id", usuario.TipoUsuarioId);
+
+            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo");
             return View(usuario);
         }
 
@@ -82,45 +85,64 @@ namespace Gestion_de_salas.Controllers
             {
                 return NotFound();
             }
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Id", usuario.TipoUsuarioId);
+
+            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
             return View(usuario);
         }
 
+
         // POST: Usuarios/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido1,Apellido2,Rut,Email,Password,Estado,TipoUsuarioId")] Usuario usuario)
+        public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaPassword)
         {
             if (id != usuario.Id)
-            {
                 return NotFound();
-            }
+
+            // Quitar validaciones que no se usan
+            ModelState.Remove("Password");
+            ModelState.Remove("NuevaPassword");
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(usuario);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UsuarioExists(usuario.Id))
-                    {
+                    var usuarioDB = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
+
+                    if (usuarioDB == null)
                         return NotFound();
-                    }
-                    else
+
+                    // Actualizar datos
+                    usuarioDB.Nombre = usuario.Nombre;
+                    usuarioDB.Apellido1 = usuario.Apellido1;
+                    usuarioDB.Apellido2 = usuario.Apellido2;
+                    usuarioDB.Rut = usuario.Rut;
+                    usuarioDB.Email = usuario.Email;
+                    usuarioDB.Estado = usuario.Estado;
+                    usuarioDB.TipoUsuarioId = usuario.TipoUsuarioId;
+
+                    // Si el usuario ingresó nueva contraseña → actualizarla
+                    if (!string.IsNullOrWhiteSpace(NuevaPassword))
                     {
-                        throw;
+                        usuarioDB.Password = NuevaPassword;
                     }
+
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", "Error al editar el usuario: " + ex.Message);
+                }
             }
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Id", usuario.TipoUsuarioId);
+
+            ViewData["TipoUsuarioId"] =
+                new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
+
             return View(usuario);
         }
+
+
 
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)

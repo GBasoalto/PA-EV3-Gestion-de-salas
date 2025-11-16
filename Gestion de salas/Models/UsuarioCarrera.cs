@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion_de_salas.Models
 {
@@ -9,10 +10,14 @@ namespace Gestion_de_salas.Models
         
         [ForeignKey("Usuario")]
         public int UsuarioId { get; set; }
+
+        [ValidateNever]
         public Usuario Usuario { get; set; }
 
         [ForeignKey("Carrera")]
         public int CarreraId { get; set; }
+
+        [ValidateNever]
         public Carrera Carrera { get; set; }
     }
 }

@@ -213,8 +213,9 @@ namespace Gestion_de_salas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("EstadoReserva")
-                        .HasColumnType("int");
+                    b.Property<string>("EstadoReserva")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateOnly>("FechaReserva")
                         .HasColumnType("date");
@@ -251,8 +252,9 @@ namespace Gestion_de_salas.Migrations
                     b.Property<int>("Capacidad")
                         .HasColumnType("int");
 
-                    b.Property<int>("EstadoSala")
-                        .HasColumnType("int");
+                    b.Property<string>("EstadoSala")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -267,28 +269,28 @@ namespace Gestion_de_salas.Migrations
                         {
                             Id = 1,
                             Capacidad = 4,
-                            EstadoSala = 2,
+                            EstadoSala = "Disponible",
                             Nombre = "Sala A"
                         },
                         new
                         {
                             Id = 2,
                             Capacidad = 4,
-                            EstadoSala = 2,
+                            EstadoSala = "Disponible",
                             Nombre = "Sala B"
                         },
                         new
                         {
                             Id = 3,
                             Capacidad = 4,
-                            EstadoSala = 2,
+                            EstadoSala = "Disponible",
                             Nombre = "Sala C"
                         },
                         new
                         {
                             Id = 4,
                             Capacidad = 4,
-                            EstadoSala = 2,
+                            EstadoSala = "Disponible",
                             Nombre = "Sala D"
                         });
                 });
@@ -301,8 +303,9 @@ namespace Gestion_de_salas.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -312,17 +315,17 @@ namespace Gestion_de_salas.Migrations
                         new
                         {
                             Id = 1,
-                            Tipo = 1
+                            Tipo = "Administrador"
                         },
                         new
                         {
                             Id = 2,
-                            Tipo = 2
+                            Tipo = "Docente"
                         },
                         new
                         {
                             Id = 3,
-                            Tipo = 3
+                            Tipo = "Estudiante"
                         });
                 });
 
@@ -374,7 +377,7 @@ namespace Gestion_de_salas.Migrations
                         new
                         {
                             Id = 1,
-                            Apellido1 = "Bsaoalto",
+                            Apellido1 = "Basoalto",
                             Apellido2 = "Gallegos",
                             Email = "gbasoalto24@cftsa.cl",
                             Estado = true,

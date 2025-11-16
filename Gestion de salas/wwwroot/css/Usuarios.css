@@ -1,0 +1,23 @@
+﻿.usuarios-container {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.usuarios-table th {
+    background-color: #5468e8 !important;
+    color: white;
+    text-align: center;
+}
+
+.usuarios-table td {
+    vertical-align: middle;
+}
+

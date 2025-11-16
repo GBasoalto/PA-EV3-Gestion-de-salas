@@ -34,7 +34,7 @@ namespace Gestion_de_salas.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Nombre = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Capacidad = table.Column<int>(type: "int", nullable: false),
-                    EstadoSala = table.Column<int>(type: "int", nullable: false)
+                    EstadoSala = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,7 +47,7 @@ namespace Gestion_de_salas.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Tipo = table.Column<int>(type: "int", nullable: false)
+                    Tipo = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -91,7 +91,7 @@ namespace Gestion_de_salas.Migrations
                     HoraFin = table.Column<TimeOnly>(type: "time", nullable: false),
                     UsuarioId = table.Column<int>(type: "int", nullable: false),
                     SalaId = table.Column<int>(type: "int", nullable: false),
-                    EstadoReserva = table.Column<int>(type: "int", nullable: false)
+                    EstadoReserva = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -197,10 +197,10 @@ namespace Gestion_de_salas.Migrations
                 columns: new[] { "Id", "Capacidad", "EstadoSala", "Nombre" },
                 values: new object[,]
                 {
-                    { 1, 4, 2, "Sala A" },
-                    { 2, 4, 2, "Sala B" },
-                    { 3, 4, 2, "Sala C" },
-                    { 4, 4, 2, "Sala D" }
+                    { 1, 4, "Disponible", "Sala A" },
+                    { 2, 4, "Disponible", "Sala B" },
+                    { 3, 4, "Disponible", "Sala C" },
+                    { 4, 4, "Disponible", "Sala D" }
                 });
 
             migrationBuilder.InsertData(
@@ -208,9 +208,9 @@ namespace Gestion_de_salas.Migrations
                 columns: new[] { "Id", "Tipo" },
                 values: new object[,]
                 {
-                    { 1, 1 },
-                    { 2, 2 },
-                    { 3, 3 }
+                    { 1, "Administrador" },
+                    { 2, "Docente" },
+                    { 3, "Estudiante" }
                 });
 
             migrationBuilder.InsertData(
@@ -218,7 +218,7 @@ namespace Gestion_de_salas.Migrations
                 columns: new[] { "Id", "Apellido1", "Apellido2", "Email", "Estado", "Nombre", "Password", "Rut", "TipoUsuarioId" },
                 values: new object[,]
                 {
-                    { 1, "Bsaoalto", "Gallegos", "gbasoalto24@cftsa.cl", true, "Gonzalo", "12345678", "15907638-5", 1 },
+                    { 1, "Basoalto", "Gallegos", "gbasoalto24@cftsa.cl", true, "Gonzalo", "12345678", "15907638-5", 1 },
                     { 2, "Castillo", "Vera", "jcastillo24@cftsa.cl", true, "Jairo", "12345678", "11111111-1", 2 },
                     { 3, "Castro", "Castro", "Jcastro24@cftsa.cl", true, "Joel", "12345678", "22222222-2", 3 }
                 });

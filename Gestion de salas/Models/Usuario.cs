@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Gestion_de_salas.Models
 {
@@ -14,9 +16,11 @@ namespace Gestion_de_salas.Models
         public bool Estado { get; set; }
 
         //ESTABLECER LA RELACION CON TIPOUSUARIO
+        [Required(ErrorMessage = "El tipo de usuario es obligatorio")]
         [ForeignKey("TipoUsuario")]
         public int TipoUsuarioId { get; set; }
 
+        [ValidateNever]
         public TipoUsuario TipoUsuario { get; set; }
 
 

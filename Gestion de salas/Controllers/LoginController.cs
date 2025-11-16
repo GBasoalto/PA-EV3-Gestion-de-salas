@@ -29,6 +29,8 @@ namespace Gestion_de_salas.Controllers
                 return View();
             }
 
+            rut = rut.Replace(".", "").Trim();
+
             // Buscar usuario por RUT
             var usuario = await _context.Usuarios
                 .Include(u => u.TipoUsuario)
@@ -36,14 +38,14 @@ namespace Gestion_de_salas.Controllers
 
             if (usuario == null)
             {
-                ViewBag.Error = "Usuario no encontrado o no activado.";
+                ViewBag.Error = "Credenciales incorrectas.";
                 return View();
             }
 
             // Verificar contraseña (por ahora sin hash)
             if (usuario.Password != password)
             {
-                ViewBag.Error = "Rut o Contraseña incorrectas.";
+                ViewBag.Error = "Credenciales incorrectas";
                 return View();
             }
 
