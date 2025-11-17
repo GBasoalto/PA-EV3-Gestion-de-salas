@@ -9,13 +9,13 @@
 }
 
 <div class="usuarios-container">
-    <div class="title-row">
+    <div class="title-row d-flex justify-content-between align-items-center mb-3">
         <h2>Usuarios</h2>
         <a asp-action="Create" class="btn btn-primary btn-sm">Crear Nuevo</a>
     </div>
 
     <table class="table table-striped table-hover usuarios-table">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th>Nombre</th>
                 <th>Apellido 1</th>
@@ -24,6 +24,7 @@
                 <th>Email</th>
                 <th>Estado</th>
                 <th>Tipo Usuario</th>
+                <th>Carreras</th> <!-- Nueva columna -->
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -48,8 +49,18 @@
                     </td>
                     <td>@item.TipoUsuario?.Tipo</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Ver</a>
+                        @if (item.UsuarioCarreras.Any())
+                        {
+                            @string.Join(", ", item.UsuarioCarreras.Select(uc => uc.Carrera.Nombre))
+                        }
+                        else
+                        {
+                            <span class="text-muted">Sin asignar</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm me-1">Editar</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm me-1">Ver</a>
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Eliminar</a>
                     </td>
                 </tr>
@@ -57,8 +68,9 @@
         </tbody>
     </table>
 </div>
+
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
 }

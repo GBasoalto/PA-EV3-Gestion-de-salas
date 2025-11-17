@@ -18,7 +18,11 @@ namespace Gestion_de_salas.Controllers
         // GET: Usuarios
         public async Task<IActionResult> Index()
         {
-            var dataContext = _context.Usuarios.Include(u => u.TipoUsuario);
+            var dataContext = _context.Usuarios
+                .Include(u => u.TipoUsuario)
+                .Include(u => u.UsuarioCarreras)
+                    .ThenInclude(uc => uc.Carrera); // Incluir carreras
+
             return View(await dataContext.ToListAsync());
         }
 
@@ -26,17 +30,16 @@ namespace Gestion_de_salas.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var usuario = await _context.Usuarios
                 .Include(u => u.TipoUsuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(u => u.UsuarioCarreras)
+                    .ThenInclude(uc => uc.Carrera)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (usuario == null)
-            {
                 return NotFound();
-            }
 
             return View(usuario);
         }
@@ -45,30 +48,36 @@ namespace Gestion_de_salas.Controllers
         public IActionResult Create()
         {
             ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo");
+            ViewData["Carreras"] = new MultiSelectList(_context.Carreras, "Id", "Nombre");
             return View();
         }
 
         // POST: Usuarios/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Usuario usuario) // Sin [Bind]
+        public async Task<IActionResult> Create(Usuario usuario, int[] selectedCarreras)
         {
             if (ModelState.IsValid)
             {
-                try
+                // Agregar carreras seleccionadas
+                if (selectedCarreras != null)
                 {
-                    _context.Add(usuario);
-                    await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    foreach (var carreraId in selectedCarreras)
+                    {
+                        usuario.UsuarioCarreras.Add(new UsuarioCarrera
+                        {
+                            CarreraId = carreraId
+                        });
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error al guardar: {ex.Message}");
-                    ModelState.AddModelError("", "Error al guardar el usuario: " + ex.Message);
-                }
+
+                _context.Add(usuario);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
 
-            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo");
+            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
+            ViewData["Carreras"] = new MultiSelectList(_context.Carreras, "Id", "Nombre", selectedCarreras);
             return View(usuario);
         }
 
@@ -76,30 +85,30 @@ namespace Gestion_de_salas.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var usuario = await _context.Usuarios.FindAsync(id);
+            var usuario = await _context.Usuarios
+                .Include(u => u.UsuarioCarreras)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (usuario == null)
-            {
                 return NotFound();
-            }
 
             ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
+            ViewData["Carreras"] = new MultiSelectList(_context.Carreras, "Id", "Nombre",
+                usuario.UsuarioCarreras.Select(uc => uc.CarreraId));
+
             return View(usuario);
         }
-
 
         // POST: Usuarios/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaPassword)
+        public async Task<IActionResult> Edit(int id, Usuario usuario, string NuevaPassword, int[] selectedCarreras)
         {
             if (id != usuario.Id)
                 return NotFound();
 
-            // Quitar validaciones que no se usan
             ModelState.Remove("Password");
             ModelState.Remove("NuevaPassword");
 
@@ -107,12 +116,14 @@ namespace Gestion_de_salas.Controllers
             {
                 try
                 {
-                    var usuarioDB = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
+                    var usuarioDB = await _context.Usuarios
+                        .Include(u => u.UsuarioCarreras)
+                        .FirstOrDefaultAsync(u => u.Id == id);
 
                     if (usuarioDB == null)
                         return NotFound();
 
-                    // Actualizar datos
+                    // Actualizar campos
                     usuarioDB.Nombre = usuario.Nombre;
                     usuarioDB.Apellido1 = usuario.Apellido1;
                     usuarioDB.Apellido2 = usuario.Apellido2;
@@ -121,10 +132,23 @@ namespace Gestion_de_salas.Controllers
                     usuarioDB.Estado = usuario.Estado;
                     usuarioDB.TipoUsuarioId = usuario.TipoUsuarioId;
 
-                    // Si el usuario ingresó nueva contraseña → actualizarla
                     if (!string.IsNullOrWhiteSpace(NuevaPassword))
                     {
                         usuarioDB.Password = NuevaPassword;
+                    }
+
+                    // Actualizar carreras
+                    usuarioDB.UsuarioCarreras.Clear();
+                    if (selectedCarreras != null)
+                    {
+                        foreach (var carreraId in selectedCarreras)
+                        {
+                            usuarioDB.UsuarioCarreras.Add(new UsuarioCarrera
+                            {
+                                UsuarioId = id,
+                                CarreraId = carreraId
+                            });
+                        }
                     }
 
                     await _context.SaveChangesAsync();
@@ -136,35 +160,32 @@ namespace Gestion_de_salas.Controllers
                 }
             }
 
-            ViewData["TipoUsuarioId"] =
-                new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
+            ViewData["TipoUsuarioId"] = new SelectList(_context.TipoUsuarios, "Id", "Tipo", usuario.TipoUsuarioId);
+            ViewData["Carreras"] = new MultiSelectList(_context.Carreras, "Id", "Nombre", selectedCarreras);
 
             return View(usuario);
         }
-
-
 
         // GET: Usuarios/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var usuario = await _context.Usuarios
                 .Include(u => u.TipoUsuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(u => u.UsuarioCarreras)
+                    .ThenInclude(uc => uc.Carrera)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
             if (usuario == null)
-            {
                 return NotFound();
-            }
 
             return View(usuario);
         }
 
-        // POST: Usuarios/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // POST: Usuarios/DeleteConfirmed/5
+        [HttpPost, ActionName("DeleteConfirmed")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -172,9 +193,8 @@ namespace Gestion_de_salas.Controllers
             if (usuario != null)
             {
                 _context.Usuarios.Remove(usuario);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

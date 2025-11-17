@@ -13,7 +13,7 @@ namespace Gestion_de_salas.Migrations
 {
     [DbContext(typeof(DataContext))]
     [Migration("20251116153908_una")]
-    partial class una
+    partial class Una
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

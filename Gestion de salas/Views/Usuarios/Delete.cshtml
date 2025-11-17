@@ -55,11 +55,24 @@
             <dt class="col-sm-3 fw-bold">Tipo de Usuario</dt>
             <dd class="col-sm-9">@Model.TipoUsuario?.Tipo</dd>
 
+            <!-- NUEVO: Mostrar Carreras -->
+            <dt class="col-sm-3 fw-bold">Carreras</dt>
+            <dd class="col-sm-9">
+                @if (Model.UsuarioCarreras.Any())
+                {
+                    @string.Join(", ", Model.UsuarioCarreras.Select(uc => uc.Carrera.Nombre))
+                }
+                else
+                {
+                    <span class="text-muted">Sin asignar</span>
+                }
+            </dd>
+
         </dl>
     </div>
 
     <div class="card-footer text-center">
-        <form asp-action="Delete" class="d-inline">
+        <form asp-action="DeleteConfirmed" method="post" class="d-inline">
             <input type="hidden" asp-for="Id" />
             <button type="submit" class="btn btn-danger me-2">
                 <i class="bi bi-trash-fill"></i> Eliminar
@@ -71,8 +84,9 @@
         </a>
     </div>
 </div>
+
 @section Scripts {
-    @{
+@{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

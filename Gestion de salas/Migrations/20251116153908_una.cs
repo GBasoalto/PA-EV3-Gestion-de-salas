@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Gestion_de_salas.Migrations
 {
     /// <inheritdoc />
-    public partial class una : Migration
+    public partial class Una : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

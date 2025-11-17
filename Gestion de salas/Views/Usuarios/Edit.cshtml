@@ -54,9 +54,6 @@
                         <span asp-validation-for="TipoUsuarioId" class="text-danger"></span>
                     </div>
 
-                    <!-- ======================
-                         CAMPO ESTADO ACTIVO/INACTIVO
-                    ======================= -->
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Estado</label>
                         <select asp-for="Estado" class="form-select">
@@ -66,10 +63,15 @@
                         <span asp-validation-for="Estado" class="text-danger"></span>
                     </div>
 
-                    <!-- NUEVA PASSWORD (opcional) -->
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Nueva Contraseña (opcional)</label>
                         <input type="password" name="NuevaPassword" class="form-control" />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Carreras</label>
+                        <select name="selectedCarreras" class="form-select" asp-items="ViewBag.Carreras" multiple="multiple"></select>
+                        <small class="text-muted">Mantén presionada la tecla Ctrl (o Cmd en Mac) para seleccionar múltiples carreras.</small>
                     </div>
 
                 </div>
@@ -85,7 +87,6 @@
 </div>
 
 @section Scripts {
-    @{
+@{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+    }}

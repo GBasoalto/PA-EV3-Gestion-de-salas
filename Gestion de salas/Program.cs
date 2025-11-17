@@ -12,8 +12,6 @@ builder.Services.AddDbContext<DataContext>(options =>
 });
 
 
-
-
 //SE AGREGA LOGIN 
 builder.Services.AddControllersWithViews();
 

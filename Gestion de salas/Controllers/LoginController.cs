@@ -53,6 +53,7 @@ namespace Gestion_de_salas.Controllers
             HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
             HttpContext.Session.SetString("NombreUsuario", $"{usuario.Nombre} {usuario.Apellido1}");
             HttpContext.Session.SetString("TipoUsuario", usuario.TipoUsuario.Tipo.ToString());
+        
 
             //REDIRIGIR AL DASHBOARD 
             return RedirectToAction("Index", "Home");

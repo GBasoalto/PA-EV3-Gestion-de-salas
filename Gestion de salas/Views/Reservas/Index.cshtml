@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Gestion_de_salas.Models.Reserva>
+
+@{
+    ViewData["Title"] = "Reservas";
+}
+
+<h1>Reservas</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nueva Reserva</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Hora Inicio</th>
+            <th>Hora Fin</th>
+            <th>Usuario</th>
+            <th>Sala</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            // Definir clase según estado
+            string claseFila = item.EstadoReserva switch
+            {
+                "Activa" => "table-success",
+                "Completada" => "table-warning",
+                "Cancelada" => "table-danger",
+                _ => ""
+            };
+            <tr class="@claseFila">
+                <td>@item.FechaReserva.ToString("dd/MM/yyyy")</td>
+                <td>@item.HoraInicio.ToString("HH:mm")</td>
+                <td>@item.HoraFin.ToString("HH:mm")</td>
+                <td>@item.Usuario?.Nombre @item.Usuario?.Apellido1</td>
+                <td>@item.Sala?.Nombre</td>
+                <td>@item.EstadoReserva</td>
+                <td>
+                    @if (item.EstadoReserva == "Activa")
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Cancelar</a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
