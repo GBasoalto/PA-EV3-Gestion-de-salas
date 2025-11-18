@@ -38,11 +38,22 @@ namespace Gestion_de_salas.Controllers
             bool cambios = false;
             foreach (var r in reservas)
             {
-                var fechaHoraFin = r.FechaReserva.ToDateTime(r.HoraFin); // Combina fecha + hora de fin
+                var fechaHoraFin = r.FechaReserva.ToDateTime(r.HoraFin);
                 if (r.EstadoReserva == "Activa" && fechaHoraFin <= DateTime.Now)
                 {
                     r.EstadoReserva = "Completada";
                     _context.Update(r);
+
+                    // Registrar movimiento automático
+                    var movimientoAuto = new Movimiento
+                    {
+                        ReservaId = r.Id,
+                        Accion = "Completada",
+                        Observacion = "Reserva finalizada automáticamente",
+                        FechaMovimiento = DateTime.Now
+                    };
+                    _context.Movimientos.Add(movimientoAuto);
+
                     cambios = true;
                 }
             }
@@ -60,7 +71,6 @@ namespace Gestion_de_salas.Controllers
 
             return View(reservas);
         }
-
 
         // DETAILS
         public async Task<IActionResult> Details(int? id)
@@ -83,18 +93,13 @@ namespace Gestion_de_salas.Controllers
 
             var tipoUsuario = HttpContext.Session.GetString("TipoUsuario");
 
-            ViewData["SalaId"] =
-                new SelectList(_context.Salas.ToList(), "Id", "Nombre");
+            ViewData["SalaId"] = new SelectList(_context.Salas.ToList(), "Id", "Nombre");
 
             if (tipoUsuario == "Administrador")
             {
                 ViewData["Usuarios"] = _context.Usuarios
                     .Where(u => u.Estado)
-                    .Select(u => new
-                    {
-                        u.Id,
-                        Nombre = u.Nombre + " " + u.Apellido1
-                    })
+                    .Select(u => new { u.Id, Nombre = u.Nombre + " " + u.Apellido1 })
                     .ToList();
             }
 
@@ -129,7 +134,6 @@ namespace Gestion_de_salas.Controllers
             }
 
             reserva.EstadoReserva = "Activa";
-
             var hoy = DateOnly.FromDateTime(DateTime.Now);
 
             if (reserva.FechaReserva < hoy)
@@ -137,8 +141,8 @@ namespace Gestion_de_salas.Controllers
 
             var inicio = reserva.HoraInicio;
             var fin = reserva.HoraFin;
-
             var minutos = (int)(fin - inicio).TotalMinutes;
+
             if (minutos < 30 || minutos > 180)
                 ModelState.AddModelError("", "La reserva debe durar entre 30 minutos y 3 horas.");
 
@@ -153,19 +157,26 @@ namespace Gestion_de_salas.Controllers
                 {
                     ViewData["Usuarios"] = _context.Usuarios
                         .Where(u => u.Estado)
-                        .Select(u => new
-                        {
-                            u.Id,
-                            Nombre = u.Nombre + " " + u.Apellido1
-                        })
+                        .Select(u => new { u.Id, Nombre = u.Nombre + " " + u.Apellido1 })
                         .ToList();
                 }
-
                 return View(reserva);
             }
 
             _context.Add(reserva);
             await _context.SaveChangesAsync();
+
+            // Registrar movimiento de creación
+            var movimiento = new Movimiento
+            {
+                ReservaId = reserva.Id,
+                Accion = "Creada",
+                Observacion = $"Reserva creada por {(tipoUsuario == "Administrador" ? "Administrador" : "Usuario")}",
+                FechaMovimiento = DateTime.Now
+            };
+            _context.Movimientos.Add(movimiento);
+            await _context.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -209,6 +220,17 @@ namespace Gestion_de_salas.Controllers
             {
                 _context.Update(reserva);
                 await _context.SaveChangesAsync();
+
+                // Registrar movimiento de edición
+                var movimientoEdit = new Movimiento
+                {
+                    ReservaId = reserva.Id,
+                    Accion = "Editada",
+                    Observacion = "Reserva modificada",
+                    FechaMovimiento = DateTime.Now
+                };
+                _context.Movimientos.Add(movimientoEdit);
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -241,6 +263,17 @@ namespace Gestion_de_salas.Controllers
             {
                 reserva.EstadoReserva = "Cancelada";
                 _context.Update(reserva);
+                await _context.SaveChangesAsync();
+
+                // Registrar movimiento de cancelación
+                var movimientoCancel = new Movimiento
+                {
+                    ReservaId = reserva.Id,
+                    Accion = "Cancelada",
+                    Observacion = "Reserva cancelada",
+                    FechaMovimiento = DateTime.Now
+                };
+                _context.Movimientos.Add(movimientoCancel);
                 await _context.SaveChangesAsync();
             }
 
@@ -281,8 +314,5 @@ namespace Gestion_de_salas.Controllers
 
             return Json(usuarios);
         }
-
-
-
     }
 }

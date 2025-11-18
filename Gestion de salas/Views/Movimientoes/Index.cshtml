@@ -1,5 +1,9 @@
 ﻿@model IEnumerable<Gestion_de_salas.Models.Movimiento>
 
+@{
+    ViewData["Title"] = "Movimientos";
+}
+
 <h1>Movimientos de Reservas</h1>
 
 <table class="table table-striped">
@@ -7,22 +11,31 @@
         <tr>
             <th>Fecha Movimiento</th>
             <th>Acción</th>
-            <th>Observación</th>
-            <th>Reserva</th>
             <th>Usuario</th>
+            <th>Carreras</th>
             <th>Sala</th>
+            <th>Observación</th>
+            <th>Acciones</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var m in Model)
+        @foreach (var item in Model)
         {
             <tr>
-                <td>@m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@m.Accion</td>
-                <td>@m.Observacion</td>
-                <td>@m.Reserva?.Id</td>
-                <td>@m.Reserva?.Usuario?.Nombre @m.Reserva?.Usuario?.Apellido1</td>
-                <td>@m.Reserva?.Sala?.Nombre</td>
+                <td>@item.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@item.Accion</td>
+                <td>@item.Reserva.Usuario?.Nombre @item.Reserva.Usuario?.Apellido1</td>
+                <td>
+                    @if (item.Reserva.Usuario != null)
+                    {
+                        @string.Join(", ", item.Reserva.Usuario.UsuarioCarreras.Select(uc => uc.Carrera.Nombre))
+                    }
+                </td>
+                <td>@item.Reserva.Sala?.Nombre</td>
+                <td>@item.Observacion</td>
+                <td>
+                    <a asp-controller="Movimientoes" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Editar</a>
+                </td>
             </tr>
         }
     </tbody>
