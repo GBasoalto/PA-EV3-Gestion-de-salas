@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Reservas";
+    var tipoUsuario = Context.Session.GetString("TipoUsuario");
 }
 
 <h1>Reservas</h1>
@@ -43,10 +44,16 @@
                 <td>
                     @if (item.EstadoReserva == "Activa")
                     {
-                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                        @if (tipoUsuario == "Administrador")
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                        }
                         <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Cancelar</a>
                     }
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+                    @if (tipoUsuario == "Administrador")
+                    {
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Detalles</a>
+                    }
                 </td>
             </tr>
         }

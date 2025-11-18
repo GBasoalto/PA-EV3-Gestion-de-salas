@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Gestion_de_salas.Data;
 using Gestion_de_salas.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace Gestion_de_salas.Controllers
 {
@@ -14,20 +15,54 @@ namespace Gestion_de_salas.Controllers
     {
         private readonly DataContext _context;
 
-
         public ReservasController(DataContext context)
         {
             _context = context;
         }
 
-        // GET: Reservas
+        // INDEX
         public async Task<IActionResult> Index()
         {
-            var dataContext = _context.Reservas.Include(r => r.Sala).Include(r => r.Usuario);
-            return View(await dataContext.ToListAsync());
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Index", "Login");
+
+            var tipoUsuario = HttpContext.Session.GetString("TipoUsuario");
+
+            // Traer reservas incluyendo Sala y Usuario
+            var reservas = await _context.Reservas
+                .Include(r => r.Sala)
+                .Include(r => r.Usuario)
+                .ToListAsync();
+
+            // Actualizar estado automático de reservas terminadas
+            bool cambios = false;
+            foreach (var r in reservas)
+            {
+                var fechaHoraFin = r.FechaReserva.ToDateTime(r.HoraFin); // Combina fecha + hora de fin
+                if (r.EstadoReserva == "Activa" && fechaHoraFin <= DateTime.Now)
+                {
+                    r.EstadoReserva = "Completada";
+                    _context.Update(r);
+                    cambios = true;
+                }
+            }
+
+            if (cambios)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            // Filtrar según tipo de usuario
+            if (tipoUsuario != "Administrador")
+            {
+                reservas = reservas.Where(r => r.UsuarioId == usuarioId.Value).ToList();
+            }
+
+            return View(reservas);
         }
 
-        // GET: Reservas/Details/5
+
+        // DETAILS
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -37,68 +72,104 @@ namespace Gestion_de_salas.Controllers
                 .Include(r => r.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (reserva == null) return NotFound();
-
-            return View(reserva);
+            return reserva == null ? NotFound() : View(reserva);
         }
 
-        // GET: Reservas/Create
+        // GET CREATE
         public IActionResult Create()
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
             if (usuarioId == null) return RedirectToAction("Index", "Login");
 
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios.Where(u => u.Id == usuarioId), "Id", "Nombre");
-            ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre");
+            var tipoUsuario = HttpContext.Session.GetString("TipoUsuario");
+
+            ViewData["SalaId"] =
+                new SelectList(_context.Salas.ToList(), "Id", "Nombre");
+
+            if (tipoUsuario == "Administrador")
+            {
+                ViewData["Usuarios"] = _context.Usuarios
+                    .Where(u => u.Estado)
+                    .Select(u => new
+                    {
+                        u.Id,
+                        Nombre = u.Nombre + " " + u.Apellido1
+                    })
+                    .ToList();
+            }
 
             var reserva = new Reserva
             {
                 FechaReserva = DateOnly.FromDateTime(DateTime.Now),
-                HoraInicio = TimeOnly.FromDateTime(DateTime.Now.AddHours(1)),
-                HoraFin = TimeOnly.FromDateTime(DateTime.Now.AddHours(2)),
                 EstadoReserva = "Activa"
             };
+
+            ViewData["MinFecha"] = DateOnly.FromDateTime(DateTime.Now).ToString("yyyy-MM-dd");
 
             return View(reserva);
         }
 
-        // POST: Reservas/Create
+        // POST CREATE
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FechaReserva,HoraInicio,HoraFin,SalaId")] Reserva reserva)
+        public async Task<IActionResult> Create([Bind("FechaReserva,HoraInicio,HoraFin,SalaId,UsuarioId")] Reserva reserva)
         {
             var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
             if (usuarioId == null) return RedirectToAction("Index", "Login");
 
-            reserva.UsuarioId = usuarioId.Value;
+            var tipoUsuario = HttpContext.Session.GetString("TipoUsuario");
+
+            if (tipoUsuario != "Administrador")
+            {
+                reserva.UsuarioId = usuarioId.Value;
+            }
+            else if (reserva.UsuarioId == 0)
+            {
+                ModelState.AddModelError("UsuarioId", "Debe seleccionar un usuario.");
+            }
+
             reserva.EstadoReserva = "Activa";
 
-            // Validar duración mínima 30 min y máxima 3 horas
-            if ((reserva.HoraFin - reserva.HoraInicio).TotalMinutes < 30 ||
-                (reserva.HoraFin - reserva.HoraInicio).TotalHours > 3)
-            {
-                ModelState.AddModelError("", "La duración de la reserva debe ser entre 30 minutos y 3 horas.");
-            }
+            var hoy = DateOnly.FromDateTime(DateTime.Now);
 
-            // Verificar solapamiento
-            if (!SalaDisponible(reserva.SalaId, reserva.FechaReserva, reserva.HoraInicio, reserva.HoraFin))
-            {
+            if (reserva.FechaReserva < hoy)
+                ModelState.AddModelError("FechaReserva", "No se puede reservar en una fecha pasada.");
+
+            var inicio = reserva.HoraInicio;
+            var fin = reserva.HoraFin;
+
+            var minutos = (int)(fin - inicio).TotalMinutes;
+            if (minutos < 30 || minutos > 180)
+                ModelState.AddModelError("", "La reserva debe durar entre 30 minutos y 3 horas.");
+
+            if (!SalaDisponible(reserva.SalaId, reserva.FechaReserva, inicio, fin))
                 ModelState.AddModelError("", "La sala ya está ocupada en ese horario.");
-            }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(reserva);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre");
+
+                if (tipoUsuario == "Administrador")
+                {
+                    ViewData["Usuarios"] = _context.Usuarios
+                        .Where(u => u.Estado)
+                        .Select(u => new
+                        {
+                            u.Id,
+                            Nombre = u.Nombre + " " + u.Apellido1
+                        })
+                        .ToList();
+                }
+
+                return View(reserva);
             }
 
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios.Where(u => u.Id == usuarioId), "Id", "Nombre", reserva.UsuarioId);
-            ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre", reserva.SalaId);
-            return View(reserva);
+            _context.Add(reserva);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Reservas/Edit/5
+        // EDIT GET
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -106,44 +177,31 @@ namespace Gestion_de_salas.Controllers
             var reserva = await _context.Reservas.FindAsync(id);
             if (reserva == null) return NotFound();
 
-            LlenarDropdowns();
+            ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre");
+            ViewData["UsuarioId"] = new SelectList(_context.Usuarios.Where(u => u.Estado), "Id", "Nombre");
+
             return View(reserva);
         }
 
-        // POST: Reservas/Edit/5
+        // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FechaReserva,HoraInicio,HoraFin,UsuarioId,SalaId,EstadoReserva")] Reserva reserva)
         {
             if (id != reserva.Id) return NotFound();
 
-            // Validaciones de horario y duración
-            var usuario = await _context.Usuarios.Include(u => u.TipoUsuario).FirstOrDefaultAsync(u => u.Id == reserva.UsuarioId);
-            if (usuario == null)
-            {
-                ModelState.AddModelError("", "Usuario no válido.");
-                LlenarDropdowns();
-                return View(reserva);
-            }
+            var hoy = DateOnly.FromDateTime(DateTime.Now);
 
-            if (!EsDiaValido(reserva.FechaReserva))
-                ModelState.AddModelError("", "No se puede reservar en domingos o festivos.");
-
-            if (!EsHorarioValido(reserva.HoraInicio, reserva.HoraFin))
-                ModelState.AddModelError("", "El horario debe estar entre 09:00 y 21:00 y HoraFin > HoraInicio.");
-
-            if (!DuracionValida(reserva.HoraInicio, reserva.HoraFin, usuario.TipoUsuarioId))
-                ModelState.AddModelError("", "La duración debe ser entre 30 minutos y 3 horas para estudiantes.");
-
-            if (usuario.TipoUsuarioId == 3 && !PuedeReservarEstudiante(usuario.Id, reserva.FechaReserva, reserva.HoraInicio, reserva.HoraFin))
-                ModelState.AddModelError("", "Los estudiantes solo pueden reservar hasta 3 horas por día.");
+            if (reserva.FechaReserva < hoy)
+                ModelState.AddModelError("FechaReserva", "No se puede colocar una fecha pasada.");
 
             if (!SalaDisponible(reserva.SalaId, reserva.FechaReserva, reserva.HoraInicio, reserva.HoraFin))
                 ModelState.AddModelError("", "La sala ya está ocupada en ese horario.");
 
             if (!ModelState.IsValid)
             {
-                LlenarDropdowns();
+                ViewData["SalaId"] = new SelectList(_context.Salas, "Id", "Nombre");
+                ViewData["UsuarioId"] = new SelectList(_context.Usuarios.Where(u => u.Estado), "Id", "Nombre");
                 return View(reserva);
             }
 
@@ -154,14 +212,14 @@ namespace Gestion_de_salas.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ReservaExists(reserva.Id)) return NotFound();
-                else throw;
+                if (!_context.Reservas.Any(r => r.Id == reserva.Id)) return NotFound();
+                throw;
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Reservas/Delete/5
+        // DELETE
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -171,12 +229,9 @@ namespace Gestion_de_salas.Controllers
                 .Include(r => r.Usuario)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (reserva == null) return NotFound();
-
-            return View(reserva);
+            return reserva == null ? NotFound() : View(reserva);
         }
 
-        // POST: Reservas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -188,103 +243,46 @@ namespace Gestion_de_salas.Controllers
                 _context.Update(reserva);
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReservaExists(int id)
-        {
-            return _context.Reservas.Any(e => e.Id == id);
-        }
-
-        #region Helpers y validaciones
-
-        private void LlenarDropdowns()
-        {
-            var usuarios = _context.Usuarios
-                .Where(u => u.Estado)
-                .Select(u => new { u.Id, NombreCompleto = u.Nombre + " " + u.Apellido1 })
-                .ToList();
-
-            var salas = _context.Salas
-                .Select(s => new { s.Id, s.Nombre })
-                .ToList();
-
-            ViewBag.UsuarioId = new SelectList(usuarios, "Id", "NombreCompleto");
-            ViewBag.SalaId = new SelectList(salas, "Id", "Nombre");
-        }
-
-        private bool EsDiaValido(DateOnly fecha)
-        {
-            if (fecha.DayOfWeek == DayOfWeek.Sunday) return false;
-
-            List<DateOnly> festivos = new List<DateOnly>
-            {
-                new DateOnly(2025,1,1),
-                new DateOnly(2025,5,1),
-                new DateOnly(2025,9,18),
-                new DateOnly(2025,12,25)
-            };
-            return !festivos.Contains(fecha);
-        }
-
-        private bool EsHorarioValido(TimeOnly inicio, TimeOnly fin)
-        {
-            var apertura = new TimeOnly(9, 0);
-            var cierre = new TimeOnly(21, 0);
-            return inicio >= apertura && fin <= cierre && fin > inicio;
-        }
-
-        private bool DuracionValida(TimeOnly inicio, TimeOnly fin, int tipoUsuarioId)
-        {
-            int duracion = (int)(fin - inicio).TotalMinutes;
-            if (duracion < 30) return false;
-            if (tipoUsuarioId == 3 && duracion > 180) return false;
-            return true;
-        }
-
-        private bool PuedeReservarEstudiante(int usuarioId, DateOnly fecha, TimeOnly inicio, TimeOnly fin)
-        {
-            var totalMinutos = _context.Reservas
-                .Where(r => r.UsuarioId == usuarioId && r.FechaReserva == fecha)
-                .Sum(r => (int)(r.HoraFin - r.HoraInicio).TotalMinutes);
-
-            int nuevosMinutos = (int)(fin - inicio).TotalMinutes;
-            return (totalMinutos + nuevosMinutos) <= 180;
-        }
-
+        // DISPONIBILIDAD
         private bool SalaDisponible(int salaId, DateOnly fecha, TimeOnly inicio, TimeOnly fin)
         {
             return !_context.Reservas.Any(r =>
                 r.SalaId == salaId &&
                 r.FechaReserva == fecha &&
                 r.EstadoReserva == "Activa" &&
-                ((inicio >= r.HoraInicio && inicio < r.HoraFin) ||
-                 (fin > r.HoraInicio && fin <= r.HoraFin) ||
-                 (inicio <= r.HoraInicio && fin >= r.HoraFin))
+                !(fin <= r.HoraInicio || inicio >= r.HoraFin)
             );
         }
 
-        // AJAX: obtener salas disponibles
+        // AJAX BUSCAR USUARIOS
         [HttpGet]
-        public IActionResult GetDisponibilidad(DateOnly fecha, TimeOnly? horaInicio = null, TimeOnly? horaFin = null)
+        public JsonResult BuscarUsuarios(string filtro)
         {
-            var salas = _context.Salas.ToList();
-            var reservas = _context.Reservas
-                .Where(r => r.FechaReserva == fecha && r.EstadoReserva == "Activa")
+            if (string.IsNullOrWhiteSpace(filtro))
+                return Json(new List<object>());
+
+            var usuarios = _context.Usuarios
+                .Where(u =>
+                    u.Nombre.Contains(filtro) ||
+                    u.Apellido1.Contains(filtro) ||
+                    u.Rut.Contains(filtro)
+                )
+                .Select(u => new
+                {
+                    id = u.Id,
+                    nombre = u.Nombre + " " + u.Apellido1,
+                    rut = u.Rut
+                })
                 .ToList();
 
-            if (horaInicio.HasValue && horaFin.HasValue)
-            {
-                reservas = reservas
-                    .Where(r => !(horaFin.Value <= r.HoraInicio || horaInicio.Value >= r.HoraFin))
-                    .ToList();
-            }
-
-            var disponibles = salas.Where(s => !reservas.Any(r => r.SalaId == s.Id)).ToList();
-
-            return Json(new { salas = disponibles });
+            return Json(usuarios);
         }
 
-        #endregion
+
+
     }
 }

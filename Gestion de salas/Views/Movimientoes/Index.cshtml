@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Gestion_de_salas.Models.Movimiento>
+
+<h1>Movimientos de Reservas</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fecha Movimiento</th>
+            <th>Acción</th>
+            <th>Observación</th>
+            <th>Reserva</th>
+            <th>Usuario</th>
+            <th>Sala</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var m in Model)
+        {
+            <tr>
+                <td>@m.FechaMovimiento.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@m.Accion</td>
+                <td>@m.Observacion</td>
+                <td>@m.Reserva?.Id</td>
+                <td>@m.Reserva?.Usuario?.Nombre @m.Reserva?.Usuario?.Apellido1</td>
+                <td>@m.Reserva?.Sala?.Nombre</td>
+            </tr>
+        }
+    </tbody>
+</table>

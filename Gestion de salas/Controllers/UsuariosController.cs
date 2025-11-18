@@ -202,5 +202,8 @@ namespace Gestion_de_salas.Controllers
         {
             return _context.Usuarios.Any(e => e.Id == id);
         }
+
+        
+
     }
 }

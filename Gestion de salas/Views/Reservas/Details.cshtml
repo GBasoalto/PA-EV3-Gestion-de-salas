@@ -1,54 +1,51 @@
 ﻿@model Gestion_de_salas.Models.Reserva
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalle de Reserva";
 }
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 
-<div>
-    <h4>Reserva</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaReserva)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaReserva)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoraInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoraInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.HoraFin)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.HoraFin)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Usuario)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Usuario.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sala)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sala.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EstadoReserva)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EstadoReserva)
-        </dd>
-    </dl>
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+        Información de la Reserva
+    </div>
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Fecha</dt>
+            <dd class="col-sm-9">@Model.FechaReserva.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-3">Hora Inicio</dt>
+            <dd class="col-sm-9">@Model.HoraInicio.ToString("HH:mm")</dd>
+
+            <dt class="col-sm-3">Hora Fin</dt>
+            <dd class="col-sm-9">@Model.HoraFin.ToString("HH:mm")</dd>
+
+            <dt class="col-sm-3">Usuario</dt>
+            <dd class="col-sm-9">@Model.Usuario?.Nombre @Model.Usuario?.Apellido1</dd>
+
+            <dt class="col-sm-3">Sala</dt>
+            <dd class="col-sm-9">@Model.Sala?.Nombre</dd>
+
+            <dt class="col-sm-3">Estado</dt>
+            <dd class="col-sm-9">
+                @if (Model.EstadoReserva == "Activa")
+                {
+                    <span class="badge bg-success">@Model.EstadoReserva</span>
+                }
+                else if (Model.EstadoReserva == "Completada")
+                {
+                    <span class="badge bg-warning text-dark">@Model.EstadoReserva</span>
+                }
+                else if (Model.EstadoReserva == "Cancelada")
+                {
+                    <span class="badge bg-danger">@Model.EstadoReserva</span>
+                }
+            </dd>
+        </dl>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Volver a Reservas</a>
 </div>
