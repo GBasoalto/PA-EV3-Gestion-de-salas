@@ -81,17 +81,17 @@ namespace Gestion_de_salas.Controllers
 
 
         // POST: Movimientoes/Edit/5
+        // POST: Movimientoes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Observacion")] Movimiento movimiento)
         {
-            if (!EsAdmin()) return Forbid(); // Solo admin puede editar
+            if (!EsAdmin()) return Forbid();
 
+            // 1. Buscamos el original en la BD
             var movimientoOriginal = await _context.Movimientos
                 .Include(m => m.Reserva)
                 .ThenInclude(r => r.Usuario)
-                .Include(m => m.Reserva)
-                .ThenInclude(r => r.Sala)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (movimientoOriginal == null)
@@ -99,32 +99,27 @@ namespace Gestion_de_salas.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    // Solo actualizar la observación
-                    movimientoOriginal.Observacion = movimiento.Observacion;
+                movimientoOriginal.Observacion = movimiento.Observacion;
 
-                    _context.Update(movimientoOriginal);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Movimientos.Any(e => e.Id == id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _context.Update(movimientoOriginal);
+                await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
-
-            // Si hay error, devolver la vista con el modelo original
-            return View(movimientoOriginal);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Movimientos.Any(e => e.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            
         }
 
     }
