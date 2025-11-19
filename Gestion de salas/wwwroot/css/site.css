@@ -1,4 +1,7 @@
-/* ===== CONFIGURACIÓN BASE ===== */
+/* ============================================================
+   BASE GENERAL
+============================================================== */
+
 html {
     font-size: 14px;
     position: relative;
@@ -21,7 +24,10 @@ body {
     background-color: #f5f5f5;
 }
 
-/* ===== FOCUS STATES ===== */
+
+/* ============================================================
+   ESTILOS FOCUS
+============================================================== */
 .btn:focus,
 .btn:active:focus,
 .btn-link.nav-link:focus,
@@ -30,70 +36,100 @@ body {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #5468e8;
 }
 
-/* ===== HEADER ===== */
-header {
+
+/* ============================================================
+   HEADER SUPERIOR
+============================================================== */
+
+.top-header {
+    height: 60px;
+    background: #5468e8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     position: sticky;
     top: 0;
-    z-index: 1000;
-    background: #5468e8;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    z-index: 2000;
 }
 
-.header-content {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem;
-}
-
-/* Logo en el header superior */
-.logo-header-top {
-    height: 45px;
-    width: auto;
-    display: block;
-    transition: transform 0.3s ease;
-}
-
-    .logo-header-top:hover {
-        transform: scale(1.05);
+    .top-header .left-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
-/* ===== LAYOUT PRINCIPAL ===== */
+.header-logo {
+    height: 80px;
+    width: auto;
+    /*object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));*/
+}
+
+.system-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.top-header .right-section {
+    display: flex;
+    align-items: center;
+    font-size: 0.95rem;
+    gap: 15px;
+}
+
+.username {
+    font-weight: 500;
+}
+
+.top-header a.btn-sm {
+    font-size: 0.82rem;
+    border-radius: 4px;
+}
+
+.logo-img {
+    width: 45px;
+    height: auto;
+    object-fit: contain;
+}
+
+
+/* ============================================================
+   CONTENEDOR PRINCIPAL
+============================================================== */
+
 .d-flex {
     display: flex;
     flex-direction: row;
     flex: 1;
-    min-height: calc(100vh - 60px);
 }
 
-/* ===== SIDEBAR ===== */
+
+/* ============================================================
+   SIDEBAR
+============================================================== */
+
 .sidebar {
     width: 260px;
     min-width: 260px;
-    min-height: 100%;
-    position: sticky;
-    top: 0;
+    min-height: 100vh;
     background: #5468e8;
     padding: 1.5rem 1rem;
     overflow-y: auto;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 60px; /* debajo del header */
 }
 
     .sidebar h4 {
         font-size: 1.1rem;
         font-weight: 600;
         margin-bottom: 1.5rem;
-        margin-top: 0.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         color: white;
         text-align: center;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
     }
 
     .sidebar .nav-link {
@@ -128,19 +164,20 @@ header {
             font-size: 1.15rem;
             width: 22px;
             text-align: center;
-            opacity: 0.9;
         }
 
-/* ===== CONTENIDO PRINCIPAL ===== */
+
+/* ============================================================
+   MAIN CONTENT
+============================================================== */
+
 main {
     flex: 1;
     padding: 2rem;
     background-color: #f5f5f5;
     overflow-y: auto;
-    max-width: 100%;
 }
 
-/* ===== CARDS Y CONTENEDORES ===== */
 .content-wrapper {
     background-color: white;
     border-radius: 8px;
@@ -156,7 +193,11 @@ main {
     color: #2c3e50;
 }
 
-/* Encabezado estilo turquesa */
+
+/* ============================================================
+   ENCABEZADOS Y SECCIONES DECORADAS
+============================================================== */
+
 .header-turquoise {
     background: linear-gradient(135deg, #5dd3c8 0%, #4dc4ba 100%);
     color: white;
@@ -168,7 +209,6 @@ main {
     box-shadow: 0 2px 6px rgba(93, 211, 200, 0.3);
 }
 
-/* Sección de antecedentes */
 .section-header {
     background: #5468e8;
     color: white;
@@ -181,7 +221,11 @@ main {
     font-size: 0.95rem;
 }
 
-/* Tabla de información */
+
+/* ============================================================
+   TABLAS
+============================================================== */
+
 .info-table {
     width: 100%;
     margin-bottom: 1.5rem;
@@ -192,3 +236,18 @@ main {
         font-weight: 600;
         color: #5468e8;
         padding: 0.75rem 1rem;
+    }
+
+
+
+/* ============================================================
+   FOOTER
+============================================================== */
+
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: auto;
+    background: #e0e0e0;
+    font-size: 0.9rem;
+}
