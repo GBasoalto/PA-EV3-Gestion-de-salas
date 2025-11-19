@@ -28,5 +28,17 @@ namespace Gestion_de_salas.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        public IActionResult Reglas()
+        {
+            return View();
+        }
+
+
     }
 }
