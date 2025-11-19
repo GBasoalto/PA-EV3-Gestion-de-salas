@@ -81,7 +81,6 @@ namespace Gestion_de_salas.Controllers
 
 
         // POST: Movimientoes/Edit/5
-        // POST: Movimientoes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Observacion")] Movimiento movimiento)
